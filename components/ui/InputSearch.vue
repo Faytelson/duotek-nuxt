@@ -16,10 +16,8 @@ const { placeholder, name, id } = defineProps({
   id: Number,
 });
 
-// emits
-const emits = defineEmits(["emitValue"]);
-
 // input value
+const emits = defineEmits(["emitValue"]);
 const inputValue = ref("");
 const emitValue = () => {
   emits("emitValue", inputValue);
