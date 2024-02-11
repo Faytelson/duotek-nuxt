@@ -30,9 +30,8 @@ export const store = defineStore("store", {
     },
   },
   actions: {
-    fetchCompanies(queryParams, args) {
-      const [page, per_page] = args;
-      let url = new URL(`http://api-test.duotek.ru/companies?page=${page}&per_page=${per_page}`);
+    fetchCompanies(queryParams) {
+      let url = new URL(`http://api-test.duotek.ru/companies`);
       for (let param in queryParams) {
         if (queryParams[param]) {
           url.searchParams.set(param, queryParams[param]);

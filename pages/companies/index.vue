@@ -16,20 +16,20 @@
               </NuxtLink>
             </div>
           </div>
-          <v-pagination v-model="pagination.currentPage" @update:modelValue="changeRoute" :length="getPaginationLength" prev-icon="mdi-menu-left" next-icon="mdi-menu-right"></v-pagination>
+          <v-pagination v-model="pagination.currentPage" @update:modelValue="fetchPaginated" :length="getPaginationLength" prev-icon="mdi-menu-left" next-icon="mdi-menu-right"></v-pagination>
         </div>
         <div class="companies__column">
           <div class="companies__filters">
             <div class="companies__filter-item">
               <div class="companies__filter-item-title">Отрасль</div>
               <div class="companies__filter">
-                <FilterComponent label="Все отрасли" :optionsList="getIndustries" @emitValue="setQueryParams($event, { id: 'industry' })"></FilterComponent>
+                <FilterComponent label="Все отрасли" :optionsList="getIndustries" :activeOption="activeIndustry" @emitValue="setDefinitionParams($event, { id: 'industry' })"></FilterComponent>
               </div>
             </div>
             <div class="companies__filter-item">
               <div class="companies__filter-item-title">Специализация</div>
               <div class="companies__filter">
-                <FilterComponent label="Все специализации" :optionsList="getSpecializacions" @emitValue="setQueryParams($event, { id: 'specialization' })"></FilterComponent>
+                <FilterComponent label="Все специализации" :optionsList="getSpecializacions" :activeOption="activeSpecialization" @emitValue="setDefinitionParams($event, { id: 'specialization' })"></FilterComponent>
               </div>
             </div>
           </div>
@@ -54,62 +54,90 @@ const companiesStore = store();
 const router = useRouter();
 const route = useRoute();
 
+// set current page
+const checkActiveRouteParams = () => {
+  queryParams.page = pagination.currentPage = +route.query.page ? +route.query.page : 1;
+  queryParams.industry = route.query.industry;
+  queryParams.specialization = route.query.specialization;
+};
+
 // pagination
 const pagination = reactive({
   perPage: 1,
   currentPage: 1,
 });
-
 const getPaginationLength = computed(() => {
   let total = companiesStore.companiesTotalPages;
   return Math.ceil(total / pagination.perPage);
 });
 
-const changeRoute = () => {
+const fetchPaginated = () => {
+  queryParams.page = pagination.currentPage;
+  queryParams.per_page = pagination.perPage;
+  fetchCompanies();
+};
+
+// set query params
+const queryParams = reactive({
+  page: pagination.currentPage,
+  per_page: pagination.perPage,
+  industry: null,
+  specialization: null,
+});
+const setDefinitionParams = (event, queryOption) => {
+  queryParams.page = pagination.currentPage = 1;
+  queryParams[queryOption.id] = event?.id ?? null;
   fetchCompanies();
 };
 
 // get companies
+const fetchCompanies = () => {
+  companiesStore.fetchCompanies(queryParams);
+  const query = {};
+  for (const param in queryParams) {
+    if (queryParams[param]) {
+      query[param] = queryParams[param];
+    }
+  }
+  router.push({
+    name: "companies",
+    path: "/companies",
+    query,
+  });
+};
 const getCompanies = computed(() => {
   return companiesStore.companies;
 });
 
-const fetchCompanies = () => {
-  companiesStore.fetchCompanies(queryParams, [pagination.currentPage, pagination.perPage]);
-  router.push({
-    name: "companies",
-    path: "/companies",
-    query: { page: pagination.currentPage, industry: queryParams.industry, specialization: queryParams.specialization },
-  });
-};
-// set current page by query parameter page before fetch
-const setCurrentPage = () => {
-  pagination.currentPage = +route.query.page ? +route.query.page : 1;
-};
-
 // get industries and specializations
+const fetchDefinitions = () => {
+  companiesStore.fetchDefinitions();
+};
 const getIndustries = computed(() => {
   return companiesStore.industries;
 });
 const getSpecializacions = computed(() => {
   return companiesStore.specializations;
 });
-const fetchDefinitions = () => {
-  companiesStore.fetchDefinitions();
-};
 
-// set query params
-const queryParams = reactive({
-  industry: null,
-  specialization: null,
+// set activeOptions for filters
+const activeSpecialization = computed(() => {
+  if (companiesStore.specializations) {
+    let specialization = companiesStore.specializations.filter((spec) => (spec.id === +route.query.specialization));
+    return specialization;
+  }
 });
-const setQueryParams = (event, queryOption) => {
-  queryParams[queryOption.id] = event?.id ?? null;
-  fetchCompanies();
-};
 
+const activeIndustry = computed(() => {
+  if (companiesStore.industries) {
+    let industry = companiesStore.industries.filter((spec) => (spec.id === +route.query.specialization));
+    return industry;
+  }
+});
+
+// mounted
 onMounted(function () {
-  setCurrentPage();
+  checkActiveRouteParams();
   fetchCompanies();
   fetchDefinitions();
 });
