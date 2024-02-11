@@ -10,7 +10,15 @@ export default defineNuxtConfig({
       },
     },
   },
-  modules: ["@pinia/nuxt"],
+  modules: ["@pinia/nuxt", "vuetify-nuxt-module"],
+  vuetify: {
+    moduleOptions: {
+      /* module specific options */
+    },
+    vuetifyOptions: {
+      /* vuetify options */
+    }
+  },
   alias: {
     pinia: "/node_modules/@pinia/nuxt/node_modules/pinia/dist/pinia.mjs",
   },

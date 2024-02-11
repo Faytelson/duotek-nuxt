@@ -14,11 +14,11 @@
           <div class="company-detail__info">
             <div class="company-detail__info-item" v-if="getCompanyInfo?.age">
               <span class="company-detail__info-item-num">{{ getCompanyInfo.age }}</span>
-              <!-- <span class="company-detail__info-item-title">{{ [getCompanyInfo.age, "год", "года", "лет"] | getWordForm }}</span> -->
+              <span class="company-detail__info-item-title">{{ getWordForm([getCompanyInfo.age, "год", "года", "лет"]) }}</span>
             </div>
             <div class="company-detail__info-item" v-if="getCompanyInfo?.staff">
               <span class="company-detail__info-item-num">{{ getCompanyInfo.staff }}</span>
-              <!-- <span class="company-detail__info-item-title">{{ [getCompanyInfo.staff, "человек", "человека", "человек"] | getWordForm }}</span> -->
+              <span class="company-detail__info-item-title">{{ getWordForm([getCompanyInfo.staff, "человек", "человека", "человек"]) }}</span>
             </div>
           </div>
           <div class="company-detail__description-short" v-if="getCompanyInfo?.description_short">{{ getCompanyInfo.description_short }}</div>
@@ -27,17 +27,17 @@
             <h2 class="company-detail__list-title">
               <Title title="Проектная специализация" :styleType="['sm']"></Title>
             </h2>
-            <!-- <div class="company-detail__specializations-list">
+            <div class="company-detail__specializations-list">
               <OptionsList :options="getCompanyInfo?.companySpecializations"></OptionsList>
-            </div> -->
+            </div>
           </div>
           <div class="company-detail__opt-list company-detail__opt-list_techs" v-if="getCompanyInfo?.industries">
             <h2 class="company-detail__list-title">
               <Title title="Технологии" :styleType="['sm']"></Title>
             </h2>
-            <!-- <div class="company-detail__techs-list">
+            <div class="company-detail__techs-list">
               <OptionsList :options="getCompanyInfo?.industries"></OptionsList>
-            </div> -->
+            </div>
           </div>
         </div>
         <div class="company-detail__aside aside">
@@ -69,7 +69,7 @@
             <div class="aside__item">
               <div class="aside__item-title">Телефон:</div>
               <div class="aside__item-data">
-                <a :href="'tel:' + getCompanyInfo.contact_phone" v-if="getCompanyInfo?.contact_phone"> {{ getCompanyInfo.contact_phone | getTel }}</a>
+                <a :href="'tel:' + getCompanyInfo.contact_phone" v-if="getCompanyInfo?.contact_phone"> {{ getTel(getCompanyInfo.contact_phone) }}</a>
                 <span v-else>-</span>
               </div>
             </div>
@@ -104,7 +104,7 @@
 <script setup>
 import { store } from "~/store/store";
 import Title from "~/components/ui/Title.vue";
-//   import OptionsList from "@/components/OptionsList.vue";
+import OptionsList from "~/components/ui/OptionsList.vue";
 
 // get company info
 const getCompanyInfo = computed(() => {
@@ -119,40 +119,30 @@ onMounted(function () {
   fetchCompanyInfo();
 });
 
-// export default {
-//   // components: {
-//   //   Title,
-//   //   OptionsList,
-//   //   ButtonComponent,
-//   // },
-//   // mounted() {
-//   //   this.fetchCompanyInfo();
-//   // },
-//   // filters: {
-//   //   getWordForm(args) {
-//   //     const [number, one, two, five] = args;
-//   //     let n = number;
-//   //     n %= 100;
-//   //     if (n >= 5 && n <= 20) {
-//   //       return five;
-//   //     }
-//   //     n %= 10;
-//   //     if (n === 1) {
-//   //       return one;
-//   //     }
-//   //     if (n >= 2 && n <= 4) {
-//   //       return two;
-//   //     }
-//   //     return five;
-//   //   },
-//   //   getTel(tel) {
-//   //     let countryCode = `+${String(tel).slice(0, 1)} `;
-//   //     let cityCode = `(${String(tel).slice(1, 4)}) `;
-//   //     let num = `${String(tel).slice(4, 7)}-${String(tel).slice(7, 9)}-${String(tel).slice(9, 11)}`;
-//   //     return `${countryCode}${cityCode}${num}`;
-//   //   },
-//   // },
-// };
+// filters for data format (word form, telephone etc)
+const getWordForm = (args) => {
+  const [number, one, two, five] = args;
+  let n = number;
+  n %= 100;
+  if (n >= 5 && n <= 20) {
+    return five;
+  }
+  n %= 10;
+  if (n === 1) {
+    return one;
+  }
+  if (n >= 2 && n <= 4) {
+    return two;
+  }
+  return five;
+};
+
+const getTel = (tel) => {
+  let countryCode = `+${String(tel).slice(0, 1)} `;
+  let cityCode = `(${String(tel).slice(1, 4)}) `;
+  let num = `${String(tel).slice(4, 7)}-${String(tel).slice(7, 9)}-${String(tel).slice(9, 11)}`;
+  return `${countryCode}${cityCode}${num}`;
+};
 </script>
 
 <style lang="scss" scoped>

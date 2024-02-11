@@ -30,16 +30,23 @@ export const store = defineStore("store", {
     },
   },
   actions: {
-    fetchCompanies(args) {
+    fetchCompanies(queryParams, args) {
       const [page, per_page] = args;
-      fetch(`http://api-test.duotek.ru/companies?page=${page}&per_page=${per_page}`)
+      let url = new URL(`http://api-test.duotek.ru/companies?page=${page}&per_page=${per_page}`);
+      for (let param in queryParams) {
+        if (queryParams[param]) {
+          url.searchParams.set(param, queryParams[param]);
+        }
+      }
+      fetch(url)
         .then((res) => res.json())
         .then((res) => {
           this.companies = res.data;
           this.companiesTotalPages = res.meta.total;
-        })
-        .catch((err) => {
-          console.log(err);
+
+          if (res.data.length <= 0) {
+            throw new Error("Page not found");
+          }
         });
     },
     fetchCompanyInfo(id) {
@@ -52,39 +59,39 @@ export const store = defineStore("store", {
           console.log(err);
         });
     },
-    fetchCompaniesSearch(args) {
-      const [per_page, searchQuery] = args;
-      fetch(`http://api-test.duotek.ru/companies?per_page=${per_page}&search=${searchQuery}`)
-        .then((res) => res.json())
-        .then((res) => {
-          this.companies = res.data;
-          this.companiesTotalPages = res.meta.total;
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
     fetchDefinitions() {
       fetch(`http://api-test.duotek.ru/definitions`)
         .then((res) => res.json())
         .then((res) => {
           this.industries = res.Industry;
-          this.CompanySpecialization = res.CompanySpecialization;
+          this.specializations = res.CompanySpecialization;
         })
         .catch((err) => {
           console.log(err);
         });
     },
-    fetchCompaniesFilter(args) {
-      const [specializations, industries] = args;
-      fetch(`http://api-test.duotek.ru/companies?specializations=${specializations}&industries=${industries}`)
-        .then((res) => res.json())
-        .then((res) => {
-          this.companyInfo = res.data;
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
+    // fetchCompaniesFilter(args) {
+    //   const [specializations, industries] = args;
+    //   fetch(`http://api-test.duotek.ru/companies?specializations=${specializations}&industries=${industries}`)
+    //     .then((res) => res.json())
+    //     .then((res) => {
+    //       this.companyInfo = res.data;
+    //     })
+    //     .catch((err) => {
+    //       console.log(err);
+    //     });
+    // },
+    // fetchCompaniesSearch(args) {
+    //   const [per_page, searchQuery] = args;
+    //   fetch(`http://api-test.duotek.ru/companies?per_page=${per_page}&search=${searchQuery}`)
+    //     .then((res) => res.json())
+    //     .then((res) => {
+    //       this.companies = res.data;
+    //       this.companiesTotalPages = res.meta.total;
+    //     })
+    //     .catch((err) => {
+    //       console.log(err);
+    //     });
+    // },
   },
 });

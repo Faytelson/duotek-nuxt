@@ -7,23 +7,18 @@
       <div class="company-link__title">{{ companyInfo.title }}</div>
       <div class="company-link__description">{{ companyInfo.description_short }}</div>
       <div class="company-link__specializations">
-        <!-- <OptionsList :options="companyInfo.companySpecializations"></OptionsList> -->
+        <OptionsList :options="companyInfo.companySpecializations"></OptionsList>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-// import OptionsList from "./OptionsList.vue";
-
+import OptionsList from './ui/OptionsList.vue';
 // props
 const { companyInfo } = defineProps({
   companyInfo: Object,
 });
-
-//   components: {
-//     OptionsList,
-//   },
 </script>
 
 <style lang="scss" scoped>
