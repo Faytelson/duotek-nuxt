@@ -7,7 +7,6 @@ export const store = defineStore("store", {
     companiesTotalPages: null,
     industries: null,
     specializations: null,
-    filteredItems: null,
   }),
   getters: {
     GET_COMPANIES() {
@@ -25,9 +24,6 @@ export const store = defineStore("store", {
     GET_SPECS() {
       return this.specializations;
     },
-    GET_FILTERED_ITEMS() {
-      return this.filteredItems;
-    },
   },
   actions: {
     fetchCompanies(queryParams) {
@@ -42,10 +38,12 @@ export const store = defineStore("store", {
         .then((res) => {
           this.companies = res.data;
           this.companiesTotalPages = res.meta.total;
-
-          if (res.data.length <= 0) {
-            throw new Error("Page not found");
-          }
+        })
+        .catch(() => {
+          throw createError({
+            statusCode: 404,
+            statusMessage: "Компаний не найдено. Попробуйте изменить параметры поиска",
+          });
         });
     },
     fetchCompanyInfo(id) {
@@ -54,8 +52,12 @@ export const store = defineStore("store", {
         .then((res) => {
           this.companyInfo = res.data;
         })
-        .catch((err) => {
-          console.log(err);
+        .catch(() => {
+          throw createError({
+            statusCode: 404,
+            message: "Такой компании не существует. Попробуйте изменить параметры поиска",
+            fatal: true,
+          });
         });
     },
     fetchDefinitions() {
@@ -65,32 +67,13 @@ export const store = defineStore("store", {
           this.industries = res.Industry;
           this.specializations = res.CompanySpecialization;
         })
-        .catch((err) => {
-          console.log(err);
+        .catch(() => {
+          throw createError({
+            statusCode: 404,
+            message: "Параметры не найдены",
+            fatal: true,
+          });
         });
     },
-    // fetchCompaniesFilter(args) {
-    //   const [specializations, industries] = args;
-    //   fetch(`http://api-test.duotek.ru/companies?specializations=${specializations}&industries=${industries}`)
-    //     .then((res) => res.json())
-    //     .then((res) => {
-    //       this.companyInfo = res.data;
-    //     })
-    //     .catch((err) => {
-    //       console.log(err);
-    //     });
-    // },
-    // fetchCompaniesSearch(args) {
-    //   const [per_page, searchQuery] = args;
-    //   fetch(`http://api-test.duotek.ru/companies?per_page=${per_page}&search=${searchQuery}`)
-    //     .then((res) => res.json())
-    //     .then((res) => {
-    //       this.companies = res.data;
-    //       this.companiesTotalPages = res.meta.total;
-    //     })
-    //     .catch((err) => {
-    //       console.log(err);
-    //     });
-    // },
   },
 });

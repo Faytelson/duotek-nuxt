@@ -56,7 +56,7 @@ const route = useRoute();
 
 // pagination
 const pagination = reactive({
-  perPage: 1,
+  perPage: 5,
   currentPage: 1,
 });
 const getPaginationLength = computed(() => {
