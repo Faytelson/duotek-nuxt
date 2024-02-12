@@ -10,11 +10,11 @@
         <div class="header__nav">
           <div class="header__menu menu">
             <ul class="menu__list">
-              <li class="menu__item"><NuxtLink to="/tenders">Тендеры</NuxtLink></li>
-              <li class="menu__item"><NuxtLink to="/companies">Компании</NuxtLink></li>
-              <li class="menu__item"><NuxtLink to="/products">Продукты</NuxtLink></li>
-              <li class="menu__item"><NuxtLink to="/cases">Кейсы</NuxtLink></li>
-              <li class="menu__item"><NuxtLink to="/blog">Блог</NuxtLink></li>
+              <li class="menu__item"><NuxtLink class="menu__link" to="/tenders">Тендеры</NuxtLink></li>
+              <li class="menu__item"><NuxtLink class="menu__link" to="/companies">Компании</NuxtLink></li>
+              <li class="menu__item"><NuxtLink class="menu__link" to="/products">Продукты</NuxtLink></li>
+              <li class="menu__item"><NuxtLink class="menu__link" to="/cases">Кейсы</NuxtLink></li>
+              <li class="menu__item"><NuxtLink class="menu__link" to="/blog">Блог</NuxtLink></li>
             </ul>
           </div>
           <div class="header__user-panel"><button class="menu__btn">Вход и регистрация</button></div>

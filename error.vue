@@ -5,11 +5,13 @@
     <div class="error__message">
       {{ error.message }}
     </div>
+    <button class="error__button-back" @click="handleClearError">Перейти на домашнюю страницу</button>
   </div>
 </template>
 
 <script setup>
 defineProps(["error"]);
+const handleClearError = () => clearError({ redirect: "/" });
 </script>
 
 <style lang="scss" scoped>
@@ -33,6 +35,14 @@ defineProps(["error"]);
   &__message {
     @include font($font-main, 20px, 400);
     color: $color-black;
+  }
+
+  &__button-back {
+    @include font($font-main, 20px, 400);
+    color: $color-black;
+    background-color: $color-light-grey;
+    padding: 8px 16px;
+    border-radius: 4px;
   }
 }
 </style>
