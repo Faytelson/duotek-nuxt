@@ -7,7 +7,7 @@
       <div class="companies__inner">
         <div class="companies__column">
           <div class="companies__search">
-            <InputSearch placeholder="Поиск продукта или отрасли" name="company_search" :id="1" @emitValue="searchQuery"></InputSearch>
+            <InputSearch placeholder="Поиск продукта или отрасли" name="company_search" :id="1" @emitValue="searchCompaniesByName"></InputSearch>
           </div>
           <div class="companies__items">
             <div class="companies__item" v-for="company in getCompanies" :key="company.id">
@@ -23,13 +23,13 @@
             <div class="companies__filter-item">
               <div class="companies__filter-item-title">Отрасль</div>
               <div class="companies__filter">
-                <FilterComponent label="Все отрасли" :optionsList="getIndustries" :activeOption="activeIndustry" @emitValue="setDefinitionParams($event, { id: 'industry' })"></FilterComponent>
+                <FilterComponent label="Все отрасли" :optionsList="getIndustries" @emitValue="setDefinitionParams($event, { id: 'industry' })"></FilterComponent>
               </div>
             </div>
             <div class="companies__filter-item">
               <div class="companies__filter-item-title">Специализация</div>
               <div class="companies__filter">
-                <FilterComponent label="Все специализации" :optionsList="getSpecializacions" :activeOption="activeSpecialization" @emitValue="setDefinitionParams($event, { id: 'specialization' })"></FilterComponent>
+                <FilterComponent label="Все специализации" :optionsList="getSpecializacions" @emitValue="setDefinitionParams($event, { id: 'specialization' })"></FilterComponent>
               </div>
             </div>
           </div>
@@ -54,13 +54,6 @@ const companiesStore = store();
 const router = useRouter();
 const route = useRoute();
 
-// set current page
-const checkActiveRouteParams = () => {
-  queryParams.page = pagination.currentPage = +route.query.page ? +route.query.page : 1;
-  queryParams.industry = route.query.industry;
-  queryParams.specialization = route.query.specialization;
-};
-
 // pagination
 const pagination = reactive({
   perPage: 1,
@@ -70,7 +63,6 @@ const getPaginationLength = computed(() => {
   let total = companiesStore.companiesTotalPages;
   return Math.ceil(total / pagination.perPage);
 });
-
 const fetchPaginated = () => {
   queryParams.page = pagination.currentPage;
   queryParams.per_page = pagination.perPage;
@@ -83,11 +75,15 @@ const queryParams = reactive({
   per_page: pagination.perPage,
   industry: null,
   specialization: null,
+  search: null,
 });
-const setDefinitionParams = (event, queryOption) => {
-  queryParams.page = pagination.currentPage = 1;
-  queryParams[queryOption.id] = event?.id ?? null;
-  fetchCompanies();
+
+// check existing query params
+const checkActiveRouteParams = () => {
+  queryParams.page = pagination.currentPage = +route.query.page ? +route.query.page : 1;
+  queryParams.industry = route.query.industry;
+  queryParams.specialization = route.query.specialization;
+  queryParams.search = route.query.search;
 };
 
 // get companies
@@ -109,7 +105,7 @@ const getCompanies = computed(() => {
   return companiesStore.companies;
 });
 
-// get industries and specializations
+// industries and specializations
 const fetchDefinitions = () => {
   companiesStore.fetchDefinitions();
 };
@@ -119,21 +115,19 @@ const getIndustries = computed(() => {
 const getSpecializacions = computed(() => {
   return companiesStore.specializations;
 });
+const setDefinitionParams = (event, queryOption) => {
+  queryParams.page = pagination.currentPage = 1;
+  queryParams[queryOption.id] = event?.id ?? null;
+  fetchCompanies();
+};
 
-// set activeOptions for filters
-const activeSpecialization = computed(() => {
-  if (companiesStore.specializations) {
-    let specialization = companiesStore.specializations.filter((spec) => (spec.id === +route.query.specialization));
-    return specialization;
+// search by name
+const searchCompaniesByName = (event) => {
+  if (event.value.length > 1 || event.value.length === 0) {
+    queryParams.search = event.value;
+    fetchCompanies();
   }
-});
-
-const activeIndustry = computed(() => {
-  if (companiesStore.industries) {
-    let industry = companiesStore.industries.filter((spec) => (spec.id === +route.query.specialization));
-    return industry;
-  }
-});
+};
 
 // mounted
 onMounted(function () {
@@ -141,66 +135,6 @@ onMounted(function () {
   fetchCompanies();
   fetchDefinitions();
 });
-
-// test
-const searchQuery = (event) => {
-  console.log(event.value);
-};
-
-//   methods: {
-// checkQueryParams() {
-//   this.pagination.currentPage = this.$route.query.page ? this.$route.query.page : 1;
-//   if (this.$route.query?.search) {
-//     this.searchQuery(this.$route.query.search);
-//   }
-// },
-// searchQuery(value) {
-//   console.log(value);
-//   this.$store.dispatch("fetchCompaniesSearch", [this.pagination.perPage, value]);
-// this.$router.push(({ name: "companies", query: { ...this.$route.query, search: value } }))
-// this.pushRouteTo({ name: "companies", query: { ...this.$route.query, search: value } });
-// },
-// pushRouteTo(route) {
-//   if (typeof route == "string") {
-//     if (this.$route.path != route) {
-//       this.$router.push(route);
-//     }
-//   } else {
-//     if (this.$route.name == route.name) {
-//       if ("params" in route) {
-//         let routesMatched = true;
-//         for (let key in this.$route.params) {
-//           const value = this.$route.params[key];
-//           if (value == null || value == undefined) {
-//             if (key in route.params) {
-//               if (route.params[key] != undefined && route.params[key] != null) {
-//                 routesMatched = false;
-//                 break;
-//               }
-//             }
-//           } else {
-//             if (key in route.params) {
-//               if (route.params[key] != value) {
-//                 routesMatched = false;
-//                 break;
-//               }
-//             } else {
-//               routesMatched = false;
-//               break;
-//             }
-//           }
-//           if (!routesMatched) {
-//             this.$router.push(route);
-//           }
-//         }
-//       } else {
-//         if (Object.keys(this.$route.params).length != 0) {
-//           this.$router.push(route);
-//         }
-//       }
-//     }
-//   }
-//   },
 </script>
 
 <style lang="scss" scoped>

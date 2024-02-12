@@ -3,7 +3,6 @@
     <div class="input-search__field">
       <input type="text" class="input-search__input" :placeholder="placeholder" :name="name" :id="id" v-model="inputValue" @input="emitValue" />
     </div>
-    {{ inputValue }}
     <button class="input-search__btn" @click="emitValue">Найти</button>
   </div>
 </template>
