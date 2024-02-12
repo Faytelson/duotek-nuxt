@@ -15,11 +15,11 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-// props
-const { optionsList, label } = defineProps({
-  optionsList: Array,
-  label: String,
+import { ref, watch } from "vue";
+const props = defineProps({
+  optionsList: { type: Array },
+  label: { type: String },
+  activeOption: { type: Object, default: null },
 });
 
 // handle options list
@@ -44,6 +44,14 @@ const removeOption = () => {
   emits("emitValue", null);
 };
 
+// set active option
+watch(
+  () => props.activeOption,
+  (newValue) => {
+    const parsedActiveOption = JSON.parse(JSON.stringify(newValue));
+    filterValue.value = parsedActiveOption[0]?.title;
+  }
+);
 </script>
 
 <style lang="scss" scoped>

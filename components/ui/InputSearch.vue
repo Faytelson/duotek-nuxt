@@ -8,11 +8,14 @@
 </template>
 
 <script setup>
+import { onMounted } from "vue";
+
 // props
-const { placeholder, name, id } = defineProps({
+const { placeholder, name, id, activeSearch } = defineProps({
   placeholder: String,
   name: String,
   id: Number,
+  activeSearch: String,
 });
 
 // input value
@@ -21,6 +24,17 @@ const inputValue = ref("");
 const emitValue = () => {
   emits("emitValue", inputValue);
 };
+
+// set active search
+const setActiveSearch = () => {
+  if (activeSearch) {
+    inputValue.value = activeSearch;
+  }
+};
+
+onMounted(() => {
+  setActiveSearch();
+});
 </script>
 
 <style lang="scss" scoped>

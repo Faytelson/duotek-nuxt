@@ -7,7 +7,7 @@
       <div class="companies__inner">
         <div class="companies__column">
           <div class="companies__search">
-            <InputSearch placeholder="Поиск продукта или отрасли" name="company_search" :id="1" @emitValue="searchCompaniesByName"></InputSearch>
+            <InputSearch placeholder="Поиск продукта или отрасли" name="company_search" :id="1" :activeSearch="activeSearch" @emitValue="searchCompaniesByName"></InputSearch>
           </div>
           <div class="companies__items">
             <div class="companies__item" v-for="company in getCompanies" :key="company.id">
@@ -23,13 +23,13 @@
             <div class="companies__filter-item">
               <div class="companies__filter-item-title">Отрасль</div>
               <div class="companies__filter">
-                <FilterComponent label="Все отрасли" :optionsList="getIndustries" @emitValue="setDefinitionParams($event, { id: 'industry' })"></FilterComponent>
+                <FilterComponent label="Все отрасли" :optionsList="getIndustries" :activeOption="activeIndustry" @emitValue="setDefinitionParams($event, { id: 'industry' })"></FilterComponent>
               </div>
             </div>
             <div class="companies__filter-item">
               <div class="companies__filter-item-title">Специализация</div>
               <div class="companies__filter">
-                <FilterComponent label="Все специализации" :optionsList="getSpecializacions" @emitValue="setDefinitionParams($event, { id: 'specialization' })"></FilterComponent>
+                <FilterComponent label="Все специализации" :optionsList="getSpecializacions" :activeOption="activeSpecialization" @emitValue="setDefinitionParams($event, { id: 'specialization' })"></FilterComponent>
               </div>
             </div>
           </div>
@@ -128,6 +128,23 @@ const searchCompaniesByName = (event) => {
     fetchCompanies();
   }
 };
+
+// set activeOptions for filters and search
+const activeIndustry = computed(() => {
+  if (companiesStore.industries) {
+    let industry = companiesStore.industries.filter((spec) => spec.id === +route.query.industry);
+    return industry;
+  }
+});
+const activeSpecialization = computed(() => {
+  if (companiesStore.specializations) {
+    let specialization = companiesStore.specializations.filter((spec) => spec.id === +route.query.specialization);
+    return specialization;
+  }
+});
+const activeSearch = computed(() => {
+  return route.query.search;
+});
 
 // mounted
 onMounted(function () {
